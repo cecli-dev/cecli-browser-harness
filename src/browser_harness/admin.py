@@ -127,7 +127,9 @@ _load_env()
 
 NAME = os.environ.get("BU_NAME", "default")
 BU_API = "https://api.browser-use.com/api/v3"
-PYPI_JSON = "https://pypi.org/pypi/browser-harness/json"
+PACKAGE_NAME = "cecli-browser-harness"
+LEGACY_PACKAGE_NAME = "browser-harness"
+PYPI_JSON = f"https://pypi.org/pypi/{PACKAGE_NAME}/json"
 VERSION_CACHE = paths.config_dir() / "version-cache.json"
 VERSION_CACHE_TTL = 24 * 3600
 DOCTOR_TEXT_LIMIT = 140
@@ -1092,15 +1094,17 @@ def sync_local_profile(profile_name, browser=None, cloud_profile_id=None,
 
 
 def _version():
-    """Installed version of the browser-harness package. Empty string if unknown."""
-    try:
-        from importlib.metadata import PackageNotFoundError, version
+    """Installed version of this harness distribution. Empty string if unknown."""
+    from importlib.metadata import PackageNotFoundError, version
+
+    for name in (PACKAGE_NAME, LEGACY_PACKAGE_NAME):
         try:
-            return version("browser-harness")
+            return version(name)
         except PackageNotFoundError:
+            continue
+        except Exception:
             return ""
-    except Exception:
-        return ""
+    return ""
 
 
 def _repo_dir():
@@ -1499,7 +1503,7 @@ def _prompt_yes(question, default_yes=True, yes=False):
 
 
 def _uv_manages_browser_harness():
-    """True when `uv tool list` shows browser-harness, i.e. `uv tool upgrade` owns it.
+    """True when `uv tool list` shows this package, i.e. `uv tool upgrade` owns it.
 
     Unknown counts as managed: if uv cannot be run or its output is unreadable we
     stay quiet rather than tell a uv user to reinstall with pip.
@@ -1517,7 +1521,7 @@ def _uv_manages_browser_harness():
         entry = line.strip()
         if entry.startswith("-"):
             continue
-        if entry.split(" ", 1)[0] == "browser-harness":
+        if entry.split(" ", 1)[0] in {PACKAGE_NAME, LEGACY_PACKAGE_NAME}:
             return True
     return False
 
@@ -1555,7 +1559,7 @@ def run_update(yes=False):
         if r.returncode != 0:
             return r.returncode
     elif mode == "pypi":
-        tool_upgrade = subprocess.run(["uv", "tool", "upgrade", "browser-harness"])
+        tool_upgrade = subprocess.run(["uv", "tool", "upgrade", PACKAGE_NAME])
         if tool_upgrade.returncode != 0:
             # `uv tool upgrade` only manages what `uv tool install` put there, so a pip
             # or pipx install fails here with "`browser-harness` is not installed" and
@@ -1565,7 +1569,7 @@ def run_update(yes=False):
             if not _uv_manages_browser_harness():
                 print(
                     "if you installed with pip or pipx, upgrade with: "
-                    "uv tool install --python 3.12 --upgrade --force browser-harness",
+                    f"uv tool install --python 3.12 --upgrade --force {PACKAGE_NAME}",
                     file=sys.stderr,
                 )
             return tool_upgrade.returncode

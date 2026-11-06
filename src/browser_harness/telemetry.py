@@ -71,12 +71,14 @@ def _save_config(data: dict) -> None:
 
 
 def _version() -> str:
-    try:
-        return version("browser-harness")
-    except PackageNotFoundError:
-        return ""
-    except Exception:
-        return ""
+    for name in ("cecli-browser-harness", "browser-harness"):
+        try:
+            return version(name)
+        except PackageNotFoundError:
+            continue
+        except Exception:
+            return ""
+    return ""
 
 
 def _env_disabled() -> bool:

@@ -973,7 +973,7 @@ def test_run_update_of_installed_wheel_never_pulls_an_enclosing_repo(tmp_path, m
     assert not any(command[:1] == ["git"] for command in commands), (
         f"run_update must not shell out to git for a wheel install; ran {commands}"
     )
-    assert ["uv", "tool", "upgrade", "browser-harness"] in commands
+    assert ["uv", "tool", "upgrade", "cecli-browser-harness"] in commands
 
 def _wheel_update_env(tmp_path, monkeypatch):
     """Set up a wheel install so run_update() takes the pypi branch."""
@@ -1005,7 +1005,7 @@ def test_failed_upgrade_tells_a_pip_install_how_to_upgrade(tmp_path, monkeypatch
     monkeypatch.setattr(subprocess, "run", fake_run)
 
     assert admin.run_update(yes=True) == 1
-    assert "uv tool install --python 3.12 --upgrade --force browser-harness" in capsys.readouterr().err
+    assert "uv tool install --python 3.12 --upgrade --force cecli-browser-harness" in capsys.readouterr().err
 
 def test_failed_upgrade_stays_quiet_for_a_uv_managed_install(tmp_path, monkeypatch, capsys):
     """When uv owns the tool the failure is uv's own (offline, auth), so a pip hint
@@ -1040,7 +1040,7 @@ def test_failed_upgrade_ignores_a_lookalike_uv_tool_name(tmp_path, monkeypatch, 
     monkeypatch.setattr(subprocess, "run", fake_run)
 
     assert admin.run_update(yes=True) == 1
-    assert "uv tool install --python 3.12 --upgrade --force browser-harness" in capsys.readouterr().err
+    assert "uv tool install --python 3.12 --upgrade --force cecli-browser-harness" in capsys.readouterr().err
 # --- Chrome's "Allow remote debugging?" popup: one pending startup per name --
 # Chrome 144+ raises the popup per CDP connection, and the connection that
 # raised it is what keeps it on screen. ensure_daemon used to kill that daemon
