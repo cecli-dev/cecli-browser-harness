@@ -18,6 +18,9 @@ print(page_info())
 PY
 ```
 
+The PyPI distribution is named `cecli-browser-harness`, but it installs the
+`browser-harness` and `browser-harness-mcp` commands. Always invoke the CLI as
+`browser-harness`.
 If `page_info()` prints, configure recording consent below, then stop.
 
 `--python 3.12` prevents uv from selecting old releases that support older Python versions. `--upgrade --force` replaces any previous `cecli-browser-harness` or `browser-harness` tool install with the latest stable release. It does not uninstall unrelated commands such as `browser-use-Browser` or `browser-use-Terminal`.
